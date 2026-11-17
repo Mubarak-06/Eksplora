@@ -1,0 +1,17 @@
+@extends('layouts.app')
+@section('title',$ecosystem->name)
+@section('content')
+<nav class="breadcrumb" aria-label="Breadcrumb"><a href="{{ route('home') }}">Beranda</a><span>›</span><a href="{{ route('exploration') }}">Eksplorasi</a><span>›</span><span>{{ $ecosystem->name }}</span></nav>
+<section class="banner"><div><span class="eyebrow">KENALI EKOSISTEM</span><h1>{{ $ecosystem->name }}</h1><p>{{ $ecosystem->summary }}</p></div><img src="{{ asset(file_exists(public_path('images/'.$ecosystem->slug.'.webp')) ? 'images/'.$ecosystem->slug.'.webp' : $ecosystem->image) }}" alt="Ilustrasi {{ $ecosystem->name }}"></section>
+<div data-tabs>
+<div class="tabs" role="tablist" aria-label="Materi ekosistem">
+@foreach(['deskripsi'=>'📖 Deskripsi','flora'=>'🌿 Flora','fauna'=>'🐾 Fauna','adaptasi'=>'🌱 Adaptasi','manfaat'=>'🤝 Manfaat','ancaman'=>'⚠ Ancaman','pelestarian'=>'🛡 Pelestarian'] as $key=>$label)<button id="tab-{{ $key }}" type="button" role="tab" aria-controls="panel-{{ $key }}" aria-selected="{{ $loop->first?'true':'false' }}" tabindex="{{ $loop->first?0:-1 }}">{{ $label }}</button>@endforeach
+</div>
+<section class="card tab-panel" id="panel-deskripsi" role="tabpanel" aria-labelledby="tab-deskripsi"><div class="description-grid"><div><h2>Gambaran Umum</h2><p>{{ $ecosystem->summary }}</p><img class="rounded" src="{{ asset(file_exists(public_path('images/'.$ecosystem->slug.'.webp')) ? 'images/'.$ecosystem->slug.'.webp' : $ecosystem->image) }}" alt="Ilustrasi habitat"></div><div>@foreach(['water'=>'💧 Kondisi Air','vegetation'=>'🌿 Vegetasi Dominan','characteristics'=>'⛰ Karakteristik'] as $key=>$label)<div class="fact-card"><h3>{{ $label }}</h3><p>{{ $ecosystem->content[$key] }}</p></div>@endforeach</div></div><aside class="fact-callout"><strong>💡 Fakta Menarik</strong><p>{{ $ecosystem->content['fact'] }}</p></aside></section>
+@foreach(['flora','fauna'] as $category)<section class="tab-panel" id="panel-{{ $category }}" role="tabpanel" aria-labelledby="tab-{{ $category }}" hidden><div class="grid three">@forelse($ecosystem->organisms()->where('category',$category)->get() as $organism)<x-organism-card :organism="$organism" />@empty<div class="card empty-state">Contoh {{ $category }} untuk ekosistem ini belum tersedia. Data akan ditambah setelah verifikasi.</div>@endforelse</div></section>@endforeach
+@foreach(['adaptasi'=>'adaptation','manfaat'=>'benefits','ancaman'=>'threats','pelestarian'=>'conservation'] as $label=>$key)<section class="card tab-panel reading-panel" id="panel-{{ $label }}" role="tabpanel" aria-labelledby="tab-{{ $label }}" hidden><h2>{{ ucfirst($label) }} {{ $ecosystem->name }}</h2><p>{{ $ecosystem->content[$key] }}</p>
+@if($key==='adaptation')<div class="grid two">@foreach(['flora'=>'Contoh Adaptasi Flora','fauna'=>'Contoh Adaptasi Fauna'] as $category=>$title)<div class="fact-card"><h3>{{ $title }}</h3>@foreach($ecosystem->organisms()->where('category',$category)->limit(2)->get() as $o)<p><strong>{{ $o->name }}:</strong> {{ $o->content['adaptation'] }}</p>@endforeach</div>@endforeach</div>@endif
+@if($key==='conservation')<x-complete activity="conservation" :subject="$ecosystem->slug" label="Tandai Materi Pelestarian Selesai" />@endif</section>@endforeach
+</div>
+<div class="action-row"><a class="button secondary" href="{{ route('exploration') }}">← Kembali ke Eksplorasi</a><x-complete activity="ecosystem" :subject="$ecosystem->slug" label="Saya Sudah Mempelajari Ekosistem Ini" /></div>
+@endsection

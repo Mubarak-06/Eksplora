@@ -1,0 +1,2 @@
+@props(['ecosystem'])
+<article class="card"><img class="card-cover" src="{{ asset(file_exists(public_path('images/'.$ecosystem->slug.'.webp')) ? 'images/'.$ecosystem->slug.'.webp' : $ecosystem->image) }}" alt="Ilustrasi {{ $ecosystem->name }}" loading="lazy"><div class="card-body"><h3>{{ $ecosystem->name }}</h3><p>{{ $ecosystem->summary }}</p><a class="button small" href="{{ route('ecosystem',$ecosystem) }}">Jelajahi →</a></div></article>
